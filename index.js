@@ -6,7 +6,7 @@ const axios = require("axios");
 const OPEN_WEATHER_API = process.env.OPEN_WEATHER_API
 
 //rapidapi weather api 
-const WEATHER_KEY = process.env.OPEN_WEATHER_API
+const API_KEY = process.env.MEME_API_KEY
 
 const PREFIX = "!"
 
@@ -19,7 +19,7 @@ try {
     {
       params: {
         'q': cityName,
-        'appid': WEATHER_KEY
+        'appid': OPEN_WEATHER_API
       }
     }
   )
@@ -99,6 +99,7 @@ async function getGifMemes(query) {
     }
   }
   )
+  return res.data.images[ranNum].url
 }
 
 const client = new Discord.Client({
@@ -111,7 +112,8 @@ const client = new Discord.Client({
 
 client.on("ready", () => {
   console.log(`Logged in as ${client.user.tag}!`);
-  getWeather("Khumjung")
+  console.log(getGifMemes("rain"))
+  // getWeather("Khumjung")
 });
 
 client.on("messageCreate", async (msg) => {
@@ -123,6 +125,7 @@ client.on("messageCreate", async (msg) => {
       case "hello":
         msg.reply("hello G!")
         break;
+
       case "meme":
         const meme = await getRandomMeme();
         // console.log(meme);
@@ -132,6 +135,7 @@ client.on("messageCreate", async (msg) => {
           console.log('error')
         }
         break;
+
       case "findMeme":
         const searchMeme = await getSearchMemes(userInput)
       if (searchMeme) {
@@ -141,6 +145,18 @@ client.on("messageCreate", async (msg) => {
         console.log('error')
       }
       break;
+
+      case 'weather':
+        const query = await getWeather(userInput)
+        const weatherGif = await getGifMemes(query)
+        if (weatherGif) {
+          msg.reply(query)
+          console.log(weatherGif)
+          msg.channel.send(weatherGif)
+        }
+        else {
+          console.log('error with weather')
+        }
 
     }
   //   if (cmd === 'hello') {
