@@ -3,18 +3,47 @@ const Discord = require("discord.js"); //imports discord.js
 const axios = require("axios");
 
 //MEME API KEY
-const API_KEY = process.env.MEME_API_KEY
+const OPEN_WEATHER_API = process.env.OPEN_WEATHER_API
 
 //rapidapi weather api 
-const WEATHER_KEY = process.env.RAPIDAPI-KEY
+const WEATHER_KEY = process.env.OPEN_WEATHER_API
 
 const PREFIX = "!"
 
 let ranNum = Math.floor(Math.random() * 5)
 
 //returns weather of selected city
-async function getWeather() {
-  
+async function getWeather(cityName) {
+try {
+  const res = await axios.get("https://api.openweathermap.org/data/2.5/weather", 
+    {
+      params: {
+        'q': cityName,
+        'appid': WEATHER_KEY
+      }
+    }
+  )
+  let weatherId = res.data.weather[0].id
+  if (weatherId >= 200 && weatherId <= 232) {
+    console.log("thunderstorm");
+    return "thunderstorm"
+  } else if (weatherId >= 300 && weatherId <= 531) {
+    console.log("raining");
+    return "raining"
+  } else if (weatherId >= 600 && weatherId <= 622) {
+    console.log("snowing");
+    return "snowing"
+  } else if (weatherId >= 801 && weatherId <= 804) {
+    console.log("cloudy");
+    return "cloudy"
+  } else if (weatherId === 800) {
+    console.log("Clear");
+    return "Clear Sky"
+  }
+  // console.log(weatherId);
+}catch (error) {
+  console.log(error)
+}
 } 
 
 //when types !meme, returns a random meme from the API
@@ -82,6 +111,7 @@ const client = new Discord.Client({
 
 client.on("ready", () => {
   console.log(`Logged in as ${client.user.tag}!`);
+  getWeather("Khumjung")
 });
 
 client.on("messageCreate", async (msg) => {
